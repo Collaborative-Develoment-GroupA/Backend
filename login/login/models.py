@@ -7,3 +7,12 @@ class Todo(models.Model):
 
    def _str_(self):
      return self.title
+
+class Login(models.Model):
+   email = models.CharField(max_length=50)
+   password = models.CharField(max_length=50)
+   username = models.CharField(max_length=100)
+
+   def _str_(self):
+      return self.email
+      
