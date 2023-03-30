@@ -37,3 +37,28 @@ def customauthenticate(email,password):
             return data
         except:
             return None
+@csrf_exempt
+def AddOfficer(request):
+    if request.method == 'POST':
+        data=json.loads(request.body)
+        firstname = data.get('firstname')
+        lastname = data.get('lastname')
+        citizenship = data.get('citizenship')
+        officer_id = data.get('id')
+        department = data.get('department')
+        post = data.get('post')
+
+        officer = Officer.objects.create(
+            firstname=firstname,
+            lastname=lastname,
+            citizenship=citizenship,
+            officer_id=officer_id,
+            department=department,
+            post=post
+        )
+        officer.save()
+
+
+        return JsonResponse({'success': True ,'message': 'Officer added successfully'})
+    else:
+        return JsonResponse({'success': False ,'message': 'Invalid request method'})
