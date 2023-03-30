@@ -8,5 +8,13 @@ class admin_login(models.Model):
     def __str__(self):
         return self.email
 
+class Officer(models.Model):
+    firstname = models.CharField(max_length=50)
+    lastname = models.CharField(max_length=50)
+    citizenship = models.CharField(max_length=50)
+    id = models.CharField(max_length=10, unique=True, primary_key = True)
+    department = models.CharField(max_length=50)
+    post = models.CharField(max_length=50)
 
-
+    def __str__(self):
+        return f"{self.firstname} {self.lastname}"

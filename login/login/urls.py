@@ -28,17 +28,3 @@ urlpatterns = [
   path('',include('api.urls')),
   path('api-token-auth', views.obtain_auth_token),
 ]
-# router = routers.DefaultRouter()                   
-# router.register(r'todos', views.TodoView, 'todo') 
-# router.register(r'logins', views.LoginView, 'login') 
-
-# urlpatterns = [
-#     path('',include(login.todo.urls)),
-#     path('admin/', admin.site.urls),  
-#     path('api/', include(router.urls)),
-#     path('',include(router.urls)),
-#     path('', include('api.urls'))
-#     path('',include('api.urls')),
-#     path('api-token-auth', views.obtain_auth_token)           
-# ]
-
