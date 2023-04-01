@@ -6,7 +6,9 @@ from .models import *
 from .serializers import *
 
 from rest_framework.decorators import api_view
+from rest_framework.decorators import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 
 
 
@@ -52,7 +54,7 @@ def AddOfficer(request):
             firstname=firstname,
             lastname=lastname,
             citizenship=citizenship,
-            officer_id=officer_id,
+            officer_id=id,
             department=department,
             post=post
         )
@@ -62,3 +64,68 @@ def AddOfficer(request):
         return JsonResponse({'success': True ,'message': 'Officer added successfully'})
     else:
         return JsonResponse({'success': False ,'message': 'Invalid request method'})
+
+@api_view(['GET'])
+def officerdetails(request):
+    officers=Officer.objects.all()
+    data = {
+        'officers': [
+            {'firstname': officer.firstname, 'lastname': officer.lastname,  'citizenship': officer.citizenship,  'officer': officer.officer_id,'department': officer.department,'post': officer.post}
+            for officer in officers
+        ]}
+    return JsonResponse(data)
+    # serializer=officerdetailserializer(officers,many=True)
+    # return Response(serializer.data)
+
+@csrf_exempt
+def AddAccident(request):
+    if request.method == 'POST':
+        data=json.loads(request.body)
+        city = data.get('city')
+        district = data.get('district')
+        date = data.get('date')
+        time = data.get('time')
+        fault_vehicle_number = data.get('fault_vehicle_number')
+        fault_driver_name = data.get('fault_driver_name')
+        fault_driver_email = data.get('fault_driver_email')
+        fault_driver_phone = data.get('fault_driver_phone')
+        fault_driver_address = data.get('fault_driver_address')
+        victim_vehicle_number = data.get('victim_vehicle_number')
+        victim_name = data.get('victim_name')
+        victim_email = data.get('victim_email')
+        victim_phone = data.get('victim_phone')
+        victim_address = data.get('victim_address')
+        injuries = data.get('injuries')
+        description = data.get('description')
+
+        accident = Accident.objects.create(
+            city=city,
+            district=district,
+            date=date,
+            time=time,
+            fault_vehicle_number=fault_vehicle_number,
+            fault_driver_name=fault_driver_name,
+            fault_driver_email=fault_driver_email,
+            fault_driver_phone=fault_driver_phone,
+            fault_driver_address=fault_driver_address,
+            victim_vehicle_number=victim_vehicle_number,
+            victim_name=victim_name,
+            victim_email=victim_email,
+            victim_phone=victim_phone,
+            victim_address=victim_address,
+            injuries=injuries,
+            description=description
+        )
+        accident.save()
+
+
+        return JsonResponse({'success': True ,'message': 'Accident added successfully'})
+    else:
+        return JsonResponse({'success': False ,'message': 'Invalid request method'})
+
+class AccidentList(APIView):
+    permission_classes = [DjangoModelPermissionsOrAnonReadOnly]
+    def get(self, request):
+        accidents = Accident.objects.all()
+        serializer = AccidentSerializer(accidents, many=True)
+        return Response(serializer.data)
