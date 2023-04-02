@@ -77,6 +77,13 @@ def officerdetails(request):
     # serializer=officerdetailserializer(officers,many=True)
     # return Response(serializer.data)
 
+class OfficerDetail(APIView):
+    permission_classes = [DjangoModelPermissionsOrAnonReadOnly]
+    def get(self, request):
+        officers = Officer.objects.all()
+        serializer = officerdetailserializer(officers, many=True)
+        return Response(serializer.data)
+
 @csrf_exempt
 def AddAccident(request):
     if request.method == 'POST':
