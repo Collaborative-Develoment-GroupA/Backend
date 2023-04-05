@@ -11,11 +11,11 @@ class officerserializer(serializers.ModelSerializer):
     model=Officer
     field='__all__'
 
-class officerdetailserializer(serializers.ModelSerializer):
-  forkey= officerserializer()
+class Officerdetailserializer(serializers.ModelSerializer):
+  # forkey= officerserializer()
   class Meta: 
     model= Officer
-    field=['ID','firstname','lastname','citizenship','department', 'post']
+    fields='__all__'
 
 class AccidentSerializer(serializers.ModelSerializer):
     class Meta:
