@@ -11,7 +11,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 
 
-
 @csrf_exempt
 def Login(request):
     if request.method == 'POST':
@@ -29,6 +28,7 @@ def Login(request):
             return JsonResponse({'success': False, 'message': 'Invalid credentials'})
     else:
         return JsonResponse({'message': 'Invalid request method'})
+
 @csrf_exempt
 def customauthenticate(email,password):
         print("Inside customauthenticate")
@@ -128,3 +128,30 @@ class AccidentList(generics.ListCreateAPIView):
         # return Response(serializer.data)
     queryset = Accident.objects.all()
     serializer_class = AccidentSerializer
+
+def auth(request):
+    if request.method==POST:
+        if simon.loggedin():
+            return redirect('dashboard')
+        else:
+            return redirect('login')
+    else:
+        return render(request,'login.html')
+
+# def login(request):
+#     if request.method==POST:
+#         username=request.POST['username']
+#         password=request.POST['password']
+#         user=auth.authenticate(username=username,password=password)
+#         if user is not None:
+#             auth.login(request,user)
+#             return redirect('dashboard')
+#         else:
+#             messages.info(request,'invalid credentials')
+#             return redirect('login')
+#     else:
+#         return render(request,'login.html') 
+
+# def logout(request):   
+#     auth.logout(request)
+#     return redirect('login')
