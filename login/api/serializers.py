@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from django.contrib.auth.models import User
 
 class adminloginserializer(serializers.ModelSerializer):
   class Meta:
@@ -12,7 +13,6 @@ class officerserializer(serializers.ModelSerializer):
     field='__all__'
 
 class Officerdetailserializer(serializers.ModelSerializer):
-  # forkey= officerserializer()
   class Meta: 
     model= Officer
     fields='__all__'

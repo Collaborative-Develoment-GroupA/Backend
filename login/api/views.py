@@ -8,7 +8,6 @@ from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
 
 
 @csrf_exempt
@@ -65,11 +64,6 @@ def AddOfficer(request):
     else:
         return JsonResponse({'success': False ,'message': 'Invalid request method'})
 
-# @api_view(['GET'])
-# def officerdetails(request):
-#     officers=Officer.objects.all()
-#     serializer=officerdetailserializer(officers,many=True)
-#     return Response(serializer.data)
 class Officerdetails(generics.ListCreateAPIView):
     queryset = Officer.objects.all()
     serializer_class = Officerdetailserializer
@@ -121,37 +115,5 @@ def AddAccident(request):
         return JsonResponse({'success': False ,'message': 'Invalid request method'})
 
 class AccidentList(generics.ListCreateAPIView):
-    # permission_classes = [DjangoModelPermissionsOrAnonReadOnly]
-    # def get(self, request):
-        # accidents = Accident.objects.all()
-        # serializer = AccidentSerializer(accidents, many=True)
-        # return Response(serializer.data)
     queryset = Accident.objects.all()
     serializer_class = AccidentSerializer
-
-def auth(request):
-    if request.method==POST:
-        if simon.loggedin():
-            return redirect('dashboard')
-        else:
-            return redirect('login')
-    else:
-        return render(request,'login.html')
-
-# def login(request):
-#     if request.method==POST:
-#         username=request.POST['username']
-#         password=request.POST['password']
-#         user=auth.authenticate(username=username,password=password)
-#         if user is not None:
-#             auth.login(request,user)
-#             return redirect('dashboard')
-#         else:
-#             messages.info(request,'invalid credentials')
-#             return redirect('login')
-#     else:
-#         return render(request,'login.html') 
-
-# def logout(request):   
-#     auth.logout(request)
-#     return redirect('login')

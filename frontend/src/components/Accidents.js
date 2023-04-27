@@ -1,45 +1,69 @@
 import React from 'react'
 import Navbar from './Navbar'
+import { useEffect, useState } from 'react';
+
 
 export const Accidents = () => {
     const [city, setCity] = useState('');
     const [district, setDistrict] = useState('');
     const [date, setDate] = useState('');
-    const [officer_id, setOfficerId] = useState('');
-    const [department, setDepartment] = useState('');
-    const [post, setPost] = useState('');
-  
+    const [time, setTiime] = useState('');
+    const [fault_vehicle_number, setFault_Driver_Vehicle_Number] = useState('');
+    const [fault_driver_name, setFault_Driver_Name] = useState('');
+    const [fault_driver_email, setFault_Driver_Email] = useState('');
+    const [fault_driver_phone, setFault_Driver_Phone] = useState('');
+    const [fault_driver_address, setFault_Driver_Address] = useState('');
+    const [victim_vehicle_number, setVictim_Vehicle_Number] = useState('');
+    const [victim_name, setVictim_Name] = useState('');
+    const [victim_email, setVictim_Email] = useState('');
+    const [victim_phone, setVictim_Phone] = useState('');
+    const [victim_address, setVictimr_Address] = useState('');
+
+
     const [officer, setOfficer] = useState({})
-  
+    const [accidentdata, accidentdatachange] = useState(null);
+
+    useEffect(() => {
+        fetch("http://localhost:8000/accidents/").then((res) => {
+            return res.json();
+        }).then((resp) => {
+            accidentdatachange(resp);
+            console.log(resp);
+        }).catch((err) => {
+            console.log(err.message);
+        })
+    }, [])
+
     const add = async (e) => {
-      e.preventDefault();
-      console.log(firstname, lastname, citizenship, officer_id, department, post)
-      try {
-        const response = await fetch("http://localhost:8000/officer/", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ firstname, lastname, citizenship, officer_id, department, post }),
-        });
-        const data = await response.json();
-        if (data['success'] === true) {
-          return window.location.href = "/officer";
+        e.preventDefault();
+        console.log(city, district, date, time, fault_vehicle_number, fault_driver_name, fault_driver_email, fault_driver_phone, fault_driver_address, victim_vehicle_number, victim_name, victim_email, victim_phone, victim_address)
+
+        try {
+            const response = await fetch("http://localhost:8000/accidents", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ city, district, date, time, fault_vehicle_number, fault_driver_name, fault_driver_email, fault_driver_phone, fault_driver_address, victim_vehicle_number, victim_name, victim_email, victim_phone, victim_address }),
+            });
+            const data = await response.json();
+            if (data['success'] === true) {
+                return window.location.href = "/accidents";
+            }
+            else {
+                alert("Invalid Credentials");
+            }
+
+        } catch (error) {
+            console.log(error);
+            // Handle the error
         }
-        else {
-          alert("Invalid Credentials");
-        }
-  
-      } catch (error) {
-        console.log(error);
-        // Handle the error
-      }
     }
     return (
         <>
-        <Navbar/>
-        <div className='officer-heading'>
-            <h2 className='text'>ADD OR REMOVE ACCIDENT DETAILS </h2>
+            <Navbar />
+            <div className='officer-heading'>
+                <h2 className='text'>ADD OR REMOVE ACCIDENT DETAILS </h2>
             </div>
             <div className='accidentbody'>
 
@@ -127,66 +151,53 @@ export const Accidents = () => {
                                 <th>District</th>
                                 <th>Date</th>
                                 <th>Time</th>
-                                <th>Fault Driver Vehicle Number</th>
-                                <th>Fault Driver Name</th>
-                                <th>Fault Driver Email</th>
-                                <th>Fault Driver Phone</th>
-                                <th>Fault Driver Address</th>
-                                <th>Victim Vehicle Number</th>
-                                <th>Victim Name</th>
-                                <th>Victim Email</th>
-                                <th>Victim Phone</th>
-                                <th>Victim Address</th>
+                                <th>Fault_Driver_Vehicle_Number</th>
+                                <th>Fault_Driver_Name</th>
+                                <th>Fault_Driver_Email</th>
+                                <th>Fault_Driver_Phone</th>
+                                <th>Fault_Driver_Address</th>
+                                <th>Victim_Vehicle_Number</th>
+                                <th>Victim_Name</th>
+                                <th>Victim_Email</th>
+                                <th>Victim_Phone</th>
+                                <th>Victim_Address</th>
                                 <th>Injuries</th>
                                 <th>Description</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>New York</td>
-                                <td>Manhattan</td>
-                                <td>2023-03-23</td>
-                                <td>13:45</td>
-                                <td>AB1234</td>
-                                <td>John Doe</td>
-                                <td>johndoe@gmail.com</td>
-                                <td>555-123-4567</td>
-                                <td>123 Main St</td>
-                                <td>CD5678</td>
-                                <td>Jane Smith</td>
-                                <td>janesmith@gmail.com</td>
-                                <td>555-987-6543</td>
-                                <td>456 Oak Ave</td>
-                                <td>2</td>
-                                <td>Car accident on 5th street</td>
-                                <td>
-                                    <button>Edit</button>
-                                    <button>Delete</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Los Angeles</td>
-                                <td>Hollywood</td>
-                                <td>2023-03-22</td>
-                                <td>19:30</td>
-                                <td>EF5678</td>
-                                <td>Tom Smith</td>
-                                <td>tomsmith@gmail.com</td>
-                                <td>555-456-7890</td>
-                                <td>789 Vine St</td>
-                                <td>GH9012</td>
-                                <td>Mary Brown</td>
-                                <td>marybrown@gmail.com</td>
-                                <td>555-234-5678</td>
-                                <td>321 Sunset Blvd</td>
-                                <td>3</td>
-                                <td>Truck collision on the highway</td>
-                                <td>
-                                    <button>Edit</button>
-                                    <button>Delete</button>
-                                </td>
-                            </tr>
+                            {accidentdata &&
+                                accidentdata.map(item => (
+                                    <tr key={item.id}>
+                                        <td>{item.id}</td>
+                                        <td>{item.city}</td>
+                                        <td>{item.district}</td>
+                                        <td>{item.date}</td>
+                                        <td>{item.time}</td>
+                                        <td>{item.fault_vehicle_number}</td>
+                                        <td>{item.fault_driver_name}</td>
+                                        <td>{item.fault_driver_email}</td>
+                                        <td>{item.fault_driver_phone}</td>
+                                        <td>{item.fault_driver_address}</td>
+                                        <td>{item.fault_driver_number}</td>
+                                        <td>{item.victim_name}</td>
+                                        <td>{item.victim_email}</td>
+                                        <td>{item.victim_phone}</td>
+
+                                        <td>{item.injuries}</td>
+                                        <td>{item.descriptions}</td>
+
+
+
+                                        <td><a className="btn btn-success">Add</a>
+                                            <a className="btn btn-danger">Remove</a>
+
+                                        </td>
+                                    </tr>
+                                ))
+                            }
+
                         </tbody>
                     </table>
                 </div>

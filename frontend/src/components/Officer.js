@@ -10,7 +10,21 @@ export const Officer = () => {
   const [department, setDepartment] = useState('');
   const [post, setPost] = useState('');
 
-  const [officer, setOfficer] = useState({})
+  const [officers, setOfficers] = useState([])
+
+  useEffect(() => {
+    const fetchOfficers = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/officers/");
+        const data = await response.json();
+        setOfficers(data);
+      } catch (error) {
+        console.log(error);
+        // Handle the error
+      }
+    };
+    fetchOfficers();
+  }, []);
 
   const add = async (e) => {
     e.preventDefault();
@@ -90,7 +104,7 @@ export const Officer = () => {
               </tr>
             </thead>
             <tbody>
-              {/* {officers.map((officer) => (
+              {officers.map((officer) => (
                 <tr key={officer.name}>
                   <td>{officer.id}</td>
                   <td>{officer.firstname}</td>
@@ -99,7 +113,7 @@ export const Officer = () => {
                   <td>{officer.department}</td>
                   <td>{officer.post}</td>
                 </tr>
-              ))} */}
+              ))}
             </tbody>
           </table>
         </div>
