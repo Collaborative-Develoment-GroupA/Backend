@@ -4,11 +4,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import *
 from .serializers import *
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
-
+from rest_framework.permissions import IsAdminUser
 
 @csrf_exempt
 def Login(request):
@@ -117,3 +117,39 @@ def AddAccident(request):
 class AccidentList(generics.ListCreateAPIView):
     queryset = Accident.objects.all()
     serializer_class = AccidentSerializer
+
+@csrf_exempt
+def AddTicket(request):
+    if request.method == 'POST':
+        data=json.loads(request.body)
+        ticket_type= data.get('ticket_type')
+        vehicle_number = data.get('vehicle_number')
+        name = data.get('name')
+        email = data.get('email')
+        contact_number= data.get('contact_number')
+        address = data.get('address')
+        city= data.get('city')
+        district= data.get('district')
+        date = data.get('date')
+        time = data.get('time')
+    
+        ticket = Ticket.objects.create(
+            ticket_type=ticket_type,
+            vehicle_number=vehicle_number,
+            name=name,
+            email=email,
+            contact_number=contact_number,
+            address=address,
+            city=city,
+            district=district,
+            date=date,
+            time=time
+        )
+        ticket.save()
+        return JsonResponse({'success': True ,'message': 'Ticket added successfully'})
+    else:
+        return JsonResponse({'success': False ,'message': 'Invalid request method'})
+
+class ShowTicket(generics.ListCreateAPIView):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer
