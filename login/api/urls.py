@@ -9,5 +9,6 @@ urlpatterns = [
     path('accidents/', AccidentList.as_view(), name='accident-details'),
     path('officers/', Officerdetails.as_view(), name='officer-details'),
     path('ticket/',views.AddTicket, name ='addticket'),
-    path('tickets/', ShowTicket.as_view(), name='ticketview')
+    path('tickets/', ShowTicket.as_view(), name='ticketview'),
+    path('user/', views.signup, name='usersignup')
 ]
