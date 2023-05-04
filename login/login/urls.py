@@ -13,32 +13,20 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-# from django.contrib import admin
-# from django.urls import path,include               
-# from rest_framework import routers                 
-# from todo import views
-# from rest_framework.authtoken import views
 
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
 from rest_framework.authtoken import views
 
-urlpatterns = [
-  path('admin/', admin.site.urls),
-  path('',include('api.urls')),
-  path('api-token-auth', views.obtain_auth_token),
-]
-# router = routers.DefaultRouter()                   
-# router.register(r'todos', views.TodoView, 'todo') 
-# router.register(r'logins', views.LoginView, 'login') 
-
 # urlpatterns = [
-#     path('',include(login.todo.urls)),
-#     path('admin/', admin.site.urls),  
-#     path('api/', include(router.urls)),
-#     path('',include(router.urls)),
-#     path('', include('api.urls'))
-#     path('',include('api.urls')),
-#     path('api-token-auth', views.obtain_auth_token)           
+#   path('admin/', admin.site.urls),
+#   path('',include('api.urls')),
+#   path('api-token-auth', views.obtain_auth_token),
 # ]
+# app_name = 'api'
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('api.urls')),
+    path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
+]
 

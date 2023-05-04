@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    
 ]
 
 MIDDLEWARE = [
@@ -173,3 +174,4 @@ CORS_ORIGIN_WHITELIST=[
 ]
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
+

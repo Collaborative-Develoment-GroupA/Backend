@@ -4,13 +4,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 from .models import *
 from .serializers import *
-
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import DjangoModelPermissionsOrAnonReadOnly
-
-
+from rest_framework.permissions import IsAdminUser
 
 @csrf_exempt
 def Login(request):
@@ -29,6 +27,7 @@ def Login(request):
             return JsonResponse({'success': False, 'message': 'Invalid credentials'})
     else:
         return JsonResponse({'message': 'Invalid request method'})
+
 @csrf_exempt
 def customauthenticate(email,password):
         print("Inside customauthenticate")
@@ -46,7 +45,7 @@ def AddOfficer(request):
         firstname = data.get('firstname')
         lastname = data.get('lastname')
         citizenship = data.get('citizenship')
-        officer_id = data.get('id')
+        # officer_id = data.get('id')
         department = data.get('department')
         post = data.get('post')
 
@@ -54,7 +53,7 @@ def AddOfficer(request):
             firstname=firstname,
             lastname=lastname,
             citizenship=citizenship,
-            officer_id=id,
+            # officer_id=id,
             department=department,
             post=post
         )
@@ -65,17 +64,9 @@ def AddOfficer(request):
     else:
         return JsonResponse({'success': False ,'message': 'Invalid request method'})
 
-@api_view(['GET'])
-def officerdetails(request):
-    officers=Officer.objects.all()
-    data = {
-        'officers': [
-            {'firstname': officer.firstname, 'lastname': officer.lastname,  'citizenship': officer.citizenship,  'officer': officer.officer_id,'department': officer.department,'post': officer.post}
-            for officer in officers
-        ]}
-    return JsonResponse(data)
-    # serializer=officerdetailserializer(officers,many=True)
-    # return Response(serializer.data)
+class Officerdetails(generics.ListCreateAPIView):
+    queryset = Officer.objects.all()
+    serializer_class = Officerdetailserializer
 
 @csrf_exempt
 def AddAccident(request):
@@ -123,9 +114,42 @@ def AddAccident(request):
     else:
         return JsonResponse({'success': False ,'message': 'Invalid request method'})
 
-class AccidentList(APIView):
-    permission_classes = [DjangoModelPermissionsOrAnonReadOnly]
-    def get(self, request):
-        accidents = Accident.objects.all()
-        serializer = AccidentSerializer(accidents, many=True)
-        return Response(serializer.data)
+class AccidentList(generics.ListCreateAPIView):
+    queryset = Accident.objects.all()
+    serializer_class = AccidentSerializer
+
+@csrf_exempt
+def AddTicket(request):
+    if request.method == 'POST':
+        data=json.loads(request.body)
+        ticket_type= data.get('ticket_type')
+        vehicle_number = data.get('vehicle_number')
+        name = data.get('name')
+        email = data.get('email')
+        contact_number= data.get('contact_number')
+        address = data.get('address')
+        city= data.get('city')
+        district= data.get('district')
+        date = data.get('date')
+        time = data.get('time')
+    
+        ticket = Ticket.objects.create(
+            ticket_type=ticket_type,
+            vehicle_number=vehicle_number,
+            name=name,
+            email=email,
+            contact_number=contact_number,
+            address=address,
+            city=city,
+            district=district,
+            date=date,
+            time=time
+        )
+        ticket.save()
+        return JsonResponse({'success': True ,'message': 'Ticket added successfully'})
+    else:
+        return JsonResponse({'success': False ,'message': 'Invalid request method'})
+
+class ShowTicket(generics.ListCreateAPIView):
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer

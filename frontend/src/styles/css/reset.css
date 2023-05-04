@@ -1,0 +1,16 @@
+.log-icon {
+    display: flex;
+      align-items: center;
+      margin-right: 25rem;
+      background-color: black;
+      width: 10000px;
+  }
+  
+  .log-icon img {
+    height: 60px;
+    width: 60px;
+    vertical-align: middle;
+    margin-left: 3rem;
+   
+  
+  }
