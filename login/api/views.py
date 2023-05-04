@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
+from rest_framework.authentication import authenticate
 
 @csrf_exempt
 def Login(request):
@@ -153,3 +154,79 @@ def AddTicket(request):
 class ShowTicket(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
+
+@csrf_exempt
+def forget(request):
+    print("Inside forget")
+    if request.method == 'POST':
+        data=json.loads(request.body)
+        email = data.get('email')
+        password=data.get('password')
+        print(email)
+        try:
+            data== User.objects.get(email=email)
+            data.password=password
+        except:
+            return JsonResponse({'success': False, 'message': 'User does not exist'})
+
+    else:
+        return Response({'message': 'Invalid request method'})
+    
+    return JsonResponse({'success': True, 'message': 'Password changed successfully'})
+
+@csrf_exempt
+def UserLogin(request):
+    if request.method == 'POST':
+        data=json.loads(request.body)
+        email = data.get('email')
+        password = data.get('password')
+        print(f'Email: {email}, Password: {password}')
+        user = customauthenticate2(email=email, password=password)
+        print(user)
+        if user is not None:
+            print("Login successful")
+
+            return JsonResponse({'success': True, 'message': 'Login successful'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Invalid credentials'})
+    else:
+        return JsonResponse({'message': 'Invalid request method'})
+
+@csrf_exempt
+def customauthenticate2(email,password):
+        print("Inside customauthenticate")
+        print(f'Email: {email}, Password: {password}')
+        try:
+            data=User.objects.get(email=email,password=password)
+            print('from userdb',data)
+            return data
+        except:
+            return None
+        
+@csrf_exempt
+def signup(request):
+    print("Inside signup")
+    if request.method == 'POST':
+        data=json.loads(request.body)
+        fullname= data.get('fullname')
+        licenseno= data.get('licenseno')
+        email = data.get('email')
+        password=data.get('password')
+
+        print(email)
+        try:
+            data== User.objects.get(email=email)
+            return JsonResponse({'success': False, 'message': 'User already exists'})
+        except:
+            user = User.objects.create(
+                fullname=fullname,
+                licenseno=licenseno,
+                email=email,
+                password=password
+            )
+            user.save()
+            return JsonResponse({'success': True, 'message': 'User created successfully'})
+
+    else:
+        return Response({'message': 'Invalid request method'})
+    
