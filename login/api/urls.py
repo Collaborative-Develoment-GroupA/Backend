@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import AccidentList, Officerdetails, ShowTicket, ShowFine, ShowBluebook
+from .views import AccidentList, Officerdetails, ShowTicket, ShowFine, ShowBluebook, TotalOfficers
 
 urlpatterns = [
     path('login/',views.Login,name='login'),
@@ -15,6 +15,7 @@ urlpatterns = [
     path('deleteofficer/<int:id>/', views.deleteOfficer, name="deleteofficer"),
     path('fine/', views.finePay, name = "finepayment"),
     path('showFine/', ShowFine.as_view(), name='show-fines'),
-    path('bluebook/', views.bluebook, name='bluebook'),
-    path('bluebookshow/', ShowBluebook.as_views() , name='bluebookrenew'),
+    path('bluebook/', views.Bluebook, name='bluebook'),
+    path('bluebookshow/', ShowBluebook.as_view() , name='bluebookrenew'),
+    path('totalofficer/', TotalOfficers.as_view(), name = 'totalofficers')
 ]

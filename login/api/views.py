@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser
 from rest_framework.authentication import authenticate
 from django.core.mail import send_mail
+from rest_framework.renderers import JSONRenderer
+from rest_framework.decorators import renderer_classes
 
 @csrf_exempt
 def Login(request):
@@ -44,31 +46,54 @@ def customauthenticate(email,password):
             return data
         except:
             return None
-@csrf_exempt
+        
 def AddOfficer(request):
     if request.method == 'POST':
-        data=json.loads(request.body)
+        data = json.loads(request.body)
         firstname = data.get('firstname')
         lastname = data.get('lastname')
         citizenship = data.get('citizenship')
-        # officer_id = data.get('id')
         department = data.get('department')
         post = data.get('post')
 
-        officer = Officer.objects.create(
-            firstname=firstname,
-            lastname=lastname,
-            citizenship=citizenship,
-            # officer_id=id,
-            department=department,
-            post=post
-        )
-        officer.save()
+        if firstname and lastname and citizenship and department and post:
+            existing_officer = Officer.objects.filter(
+                firstname=firstname,
+                lastname=lastname,
+                citizenship=citizenship,
+                department=department,
+                post=post
+            ).exists()
 
+            if existing_officer:
+                return JsonResponse({'success': False, 'message': 'Officer already exists'})
+            else:
+                officer = Officer.objects.create(
+                    firstname=firstname,
+                    lastname=lastname,
+                    citizenship=citizenship,
+                    department=department,
+                    post=post
+                )
+                return JsonResponse({'success': True, 'message': 'Officer added successfully'})
+        else:
+            missing_fields = []
+            if not firstname:
+                missing_fields.append('firstname')
+            if not lastname:
+                missing_fields.append('lastname')
+            if not citizenship:
+                missing_fields.append('citizenship')
+            if not department:
+                missing_fields.append('department')
+            if not post:
+                missing_fields.append('post')
 
-        return JsonResponse({'success': True ,'message': 'Officer added successfully'})
+            missing_fields_str = ', '.join(missing_fields)
+            return JsonResponse({'success': False, 'message': f'Missing data in fields: {missing_fields_str}'})
     else:
-        return JsonResponse({'success': False ,'message': 'Invalid request method'})
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
 
 class Officerdetails(generics.ListCreateAPIView):
     queryset = Officer.objects.all()
@@ -87,7 +112,7 @@ def deleteOfficer(request, id):
 @csrf_exempt
 def AddAccident(request):
     if request.method == 'POST':
-        data=json.loads(request.body)
+        data = json.loads(request.body)
         city = data.get('city')
         district = data.get('district')
         date = data.get('date')
@@ -105,30 +130,94 @@ def AddAccident(request):
         injuries = data.get('injuries')
         description = data.get('description')
 
-        accident = Accident.objects.create(
-            city=city,
-            district=district,
-            date=date,
-            time=time,
-            fault_vehicle_number=fault_vehicle_number,
-            fault_driver_name=fault_driver_name,
-            fault_driver_email=fault_driver_email,
-            fault_driver_phone=fault_driver_phone,
-            fault_driver_address=fault_driver_address,
-            victim_vehicle_number=victim_vehicle_number,
-            victim_name=victim_name,
-            victim_email=victim_email,
-            victim_phone=victim_phone,
-            victim_address=victim_address,
-            injuries=injuries,
-            description=description
-        )
-        accident.save()
+        if (
+            city and district and date and time and fault_vehicle_number and
+            fault_driver_name and fault_driver_email and fault_driver_phone and
+            fault_driver_address and victim_vehicle_number and victim_name and
+            victim_email and victim_phone and victim_address and injuries and description
+        ):
+            existing_accident = Accident.objects.filter(
+                city=city,
+                district=district,
+                date=date,
+                time=time,
+                fault_vehicle_number=fault_vehicle_number,
+                fault_driver_name=fault_driver_name,
+                fault_driver_email=fault_driver_email,
+                fault_driver_phone=fault_driver_phone,
+                fault_driver_address=fault_driver_address,
+                victim_vehicle_number=victim_vehicle_number,
+                victim_name=victim_name,
+                victim_email=victim_email,
+                victim_phone=victim_phone,
+                victim_address=victim_address,
+                injuries=injuries,
+                description=description
+            ).exists()
 
+            if existing_accident:
+                return JsonResponse({'success': False, 'message': 'Accident already exists'})
+            else:
+                accident = Accident.objects.create(
+                    city=city,
+                    district=district,
+                    date=date,
+                    time=time,
+                    fault_vehicle_number=fault_vehicle_number,
+                    fault_driver_name=fault_driver_name,
+                    fault_driver_email=fault_driver_email,
+                    fault_driver_phone=fault_driver_phone,
+                    fault_driver_address=fault_driver_address,
+                    victim_vehicle_number=victim_vehicle_number,
+                    victim_name=victim_name,
+                    victim_email=victim_email,
+                    victim_phone=victim_phone,
+                    victim_address=victim_address,
+                    injuries=injuries,
+                    description=description
+                )
+                return JsonResponse({'success': True, 'message': 'Accident added successfully'})
+        else:
+            missing_fields = []
+            if not city:
+                missing_fields.append('city')
+            if not district:
+                missing_fields.append('district')
+            if not date:
+                missing_fields.append('date')
+            if not time:
+                missing_fields.append('time')
+            if not fault_vehicle_number:
+                missing_fields.append('fault_vehicle_number')
+            if not fault_driver_name:
+                missing_fields.append('fault_driver_name')
+            if not fault_driver_email:
+                missing_fields.append('fault_driver_email')
+            if not fault_driver_phone:
+                missing_fields.append('fault_driver_phone')
+            if not fault_driver_address:
+                missing_fields.append('fault_driver_address')
+            if not victim_vehicle_number:
+                missing_fields.append('victim_vehicle_number')
+            if not victim_name:
+                missing_fields.append('victim_name')
+            if not victim_email:
+                missing_fields.append('victim_email')
+            if not victim_phone:
+                missing_fields.append('victim_phone')
+            if not victim_phone:
+                missing_fields.append('victim_phone')
+            if not victim_address:
+                missing_fields.append('victim_address')
+            if not injuries:
+                missing_fields.append('injuries')
+            if not description:
+                missing_fields.append('description')
 
-        return JsonResponse({'success': True ,'message': 'Accident added successfully'})
+            missing_fields_str = ', '.join(missing_fields)
+            return JsonResponse({'success': False, 'message': f'Missing data in fields: {missing_fields_str}'})
     else:
-        return JsonResponse({'success': False ,'message': 'Invalid request method'})
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 class AccidentList(generics.ListCreateAPIView):
     queryset = Accident.objects.all()
@@ -137,41 +226,69 @@ class AccidentList(generics.ListCreateAPIView):
 @csrf_exempt
 def AddTicket(request):
     if request.method == 'POST':
-        data=json.loads(request.body)
-        ticket_type= data.get('ticket_type')
+        data = json.loads(request.body)
+        ticket_type = data.get('ticket_type')
         vehicle_number = data.get('vehicle_number')
         name = data.get('name')
         email = data.get('email')
-        contact_number= data.get('contact_number')
+        contact_number = data.get('contact_number')
         address = data.get('address')
-        city= data.get('city')
-        district= data.get('district')
+        city = data.get('city')
+        district = data.get('district')
         date = data.get('date')
         time = data.get('time')
-    
-        ticket = Ticket.objects.create(
-            ticket_type=ticket_type,
-            vehicle_number=vehicle_number,
-            name=name,
-            email=email,
-            contact_number=contact_number,
-            address=address,
-            city=city,
-            district=district,
-            date=date,
-            time=time
-        )
-        ticket.save()
-        return JsonResponse({'success': True ,'message': 'Ticket added successfully'})
+
+        if ticket_type and vehicle_number and name and email and contact_number and address and city and district and date and time:
+            if Ticket.objects.filter(vehicle_number=vehicle_number).exists():
+                return JsonResponse({'success': False, 'message': 'Ticket with the same vehicle number already exists'})
+
+            ticket = Ticket.objects.create(
+                ticket_type=ticket_type,
+                vehicle_number=vehicle_number,
+                name=name,
+                email=email,
+                contact_number=contact_number,
+                address=address,
+                city=city,
+                district=district,
+                date=date,
+                time=time
+            )
+            ticket.save()
+            return JsonResponse({'success': True, 'message': 'Ticket added successfully'})
+        else:
+            missing_fields = []
+            if not ticket_type:
+                missing_fields.append('ticket_type')
+            if not vehicle_number:
+                missing_fields.append('vehicle_number')
+            if not name:
+                missing_fields.append('name')
+            if not email:
+                missing_fields.append('email')
+            if not contact_number:
+                missing_fields.append('contact_number')
+            if not address:
+                missing_fields.append('address')
+            if not city:
+                missing_fields.append('city')
+            if not district:
+                missing_fields.append('district')
+            if not date:
+                missing_fields.append('date')
+            if not time:
+                missing_fields.append('time')
+
+            missing_fields_str = ', '.join(missing_fields)
+            return JsonResponse({'success': False, 'message': f'Missing data in fields: {missing_fields_str}'})
     else:
-        return JsonResponse({'success': False ,'message': 'Invalid request method'})
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
 
 class ShowTicket(generics.ListCreateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketSerializer
 
-from rest_framework.renderers import JSONRenderer
-from rest_framework.decorators import renderer_classes
 @csrf_exempt
 @renderer_classes([JSONRenderer])
 def forget(request):
@@ -233,17 +350,17 @@ def customauthenticate2(email,password):
 def signup(request):
     print("Inside signup")
     if request.method == 'POST':
-        data=json.loads(request.body)
-        fullname= data.get('fullName')
-        licenseno= data.get('licenseno')
+        data = json.loads(request.body)
+        fullname = data.get('fullName')
+        licenseno = data.get('licenseno')
         email = data.get('email')
-        password=data.get('password')
+        password = data.get('password')
 
-        print(email)
-        try:
-            data== User.objects.get(email=email)
-            return JsonResponse({'success': False, 'message': 'User already exists'})
-        except:
+        if fullname and licenseno and email and password:
+            # Check if a user with the same email already exists
+            if User.objects.filter(email=email).exists():
+                return JsonResponse({'success': False, 'message': 'User with the same email already exists'})
+
             user = User.objects.create(
                 fullName=fullname,
                 licenseno=licenseno,
@@ -252,9 +369,22 @@ def signup(request):
             )
             user.save()
             return JsonResponse({'success': True, 'message': 'User created successfully'})
+        else:
+            missing_fields = []
+            if not fullname:
+                missing_fields.append('fullName')
+            if not licenseno:
+                missing_fields.append('licenseno')
+            if not email:
+                missing_fields.append('email')
+            if not password:
+                missing_fields.append('password')
 
+            missing_fields_str = ', '.join(missing_fields)
+            return JsonResponse({'success': False, 'message': f'Missing data in fields: {missing_fields_str}'})
     else:
-        return Response({'message': 'Invalid request method'})
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
     
 
 @csrf_exempt
@@ -293,16 +423,33 @@ def finePay(request):
         district = data.get('district')
         chit_number = data.get('chit_number')
 
-        fine = Fine.objects.create(
-            fiscal_year = fiscal_year,
-            province = province,
-            district = district,
-            chit_number = chit_number
-        )
-        fine.save()
-        return JsonResponse({'success': True, 'message': 'Fine added successfully'})
+        if fiscal_year and province and district and chit_number:
+            existing_fine = Fine.objects.filter(fiscal_year=fiscal_year, province=province, district=district, chit_number=chit_number).exists()
+            if existing_fine:
+                return JsonResponse({'success': False, 'message': 'Fine already exists'})
+            else:
+                fine = Fine.objects.create(
+                    fiscal_year=fiscal_year,
+                    province=province,
+                    district=district,
+                    chit_number=chit_number
+                )
+                return JsonResponse({'success': True, 'message': 'Fine added successfully'})
+        else:
+            missing_fields = []
+            if not fiscal_year:
+                missing_fields.append('fiscal_year')
+            if not province:
+                missing_fields.append('province')
+            if not district:
+                missing_fields.append('district')
+            if not chit_number:
+                missing_fields.append('chit_number')
+
+            missing_fields_str = ', '.join(missing_fields)
+            return JsonResponse({'success': False, 'message': f'Missing data in fields: {missing_fields_str}'})
     else:
-        return JsonResponse({'success': False ,'message': 'Invalid request method'})
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
 class ShowFine(generics.ListCreateAPIView):
     queryset = Fine.objects.all()
@@ -333,6 +480,13 @@ def Bluebook(request):
         return JsonResponse({'success': False ,'message': 'Invalid request method'})
     
 class ShowBluebook(generics.ListCreateAPIView):
-    queryset = Bluebook.objects.all()
+    queryset = BluebookRenew.objects.all()
     serializer_class = BluebookSerializer
 
+
+class TotalOfficers(generics.ListCreateAPIView):
+    queryset = Officer.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        count = self.queryset.count()
+        return Response({'count': count})
