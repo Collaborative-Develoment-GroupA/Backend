@@ -24,7 +24,7 @@ export const Accidents = () => {
     const [accidentdata, accidentdatachange] = useState(null);
 
     useEffect(() => {
-        fetch("http://localhost:8000/accidents/").then((res) => {
+        fetch("https://simonpradhan.pythonanywhere.com/accidents/").then((res) => {
             return res.json();
         }).then((resp) => {
             accidentdatachange(resp);
@@ -39,7 +39,7 @@ export const Accidents = () => {
         console.log(city, district, date, time, fault_vehicle_number, fault_driver_name, fault_driver_email, fault_driver_phone, fault_driver_address, victim_vehicle_number, victim_name, victim_email, victim_phone, victim_address)
 
         try {
-            const response = await fetch("http://localhost:8000/accident", {
+            const response = await fetch("https://simonpradhan.pythonanywhere.com/accident", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -49,3 +49,13 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
+
+class FineSerializer(serializers.ModelSerializer):
+   class Meta:
+      model = Fine
+      fields = '__all__'
+
+class BluebookSerializer(serializers.ModelSerializer):
+   class Meta:
+      model = BluebookRenew
+      fields = '__all__'

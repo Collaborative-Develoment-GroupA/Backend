@@ -15,7 +15,7 @@ export const Officer = () => {
   useEffect(() => {
     const fetchOfficers = async () => {
       try {
-        const response = await fetch("http://localhost:8000/officers/");
+        const response = await fetch("https://simonpradhan.pythonanywhere.com/officers/");
         const data = await response.json();
         setOfficers(data);
       } catch (error) {
@@ -30,7 +30,7 @@ export const Officer = () => {
     e.preventDefault();
     console.log(firstname, lastname, citizenship, officer_id, department, post)
     try {
-      const response = await fetch("http://localhost:8000/officer/", {
+      const response = await fetch("https://simonpradhan.pythonanywhere.com/officer/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

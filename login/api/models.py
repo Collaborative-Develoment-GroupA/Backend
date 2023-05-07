@@ -52,5 +52,16 @@ class Ticket(models.Model):
     date = models.DateField()
     time = models.TimeField()
 
+class BluebookRenew(models.Model):
+    province = models.CharField(max_length=20)
+    vehicle_type = models.CharField(max_length=30)
+    district_code = models.CharField(max_length=20)
+    lot_no = models.CharField(max_length=20)
+    symbol = models.CharField(max_length=20)
+    vehicle_no = models.CharField(max_length=30)
 
-    
+class Fine(models.Model):
+    fiscal_year = models.CharField(max_length=20)
+    province = models.CharField(max_length=20)
+    district = models.CharField(max_length=20)
+    chit_number = models.CharField(max_length=30)
