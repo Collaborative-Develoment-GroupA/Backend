@@ -34,7 +34,7 @@ class Accident(models.Model):
     injuries = models.TextField()
     description = models.TextField()
 
-class User(models.Model):
+class TmsUser(models.Model):
     fullName = models.CharField(max_length=100)
     licenseno = models.IntegerField()
     email = models.EmailField()

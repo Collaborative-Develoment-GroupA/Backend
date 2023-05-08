@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt 
 
 from .models import *
-from api.models import User
+# from api.models import User
 from .serializers import *
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
@@ -308,7 +308,8 @@ def forget(request):
             # Store the OTP in the session for later verification
             request.session['otp'] = otp
             request.session['email'] = email
-            return JsonResponse({'success': True, 'message': 'Password changed successfully'})
+            response_data = {'otp': otp, 'success': 'otp accquired'}
+            return JsonResponse(response_data)
 
         else:
             return JsonResponse({'success': True, 'message': 'Password changed successfully'})
@@ -328,19 +329,23 @@ def UserLogin(request):
         print(user)
         if user is not None:
             print("Login successful")
-
-            return JsonResponse({'success': True, 'message': 'Login successful'})
+            response_data = {
+                'name': user.fullName,
+                'email': user.email,
+            }
+            return JsonResponse(response_data)
         else:
             return JsonResponse({'success': False, 'message': 'Invalid credentials'})
     else:
-        return JsonResponse({'message': 'Invalid request method'})
+        return JsonResponse({'success': False, 'message': 'Invalid request method'})
+    
 
 @csrf_exempt
 def customauthenticate2(email,password):
         print("Inside customauthenticate")
         print(f'Email: {email}, Password: {password}')
         try:
-            data=User.objects.get(email=email,password=password)
+            data=TmsUser.objects.get(email=email,password=password)
             print('from userdb',data)
             return data
         except:
@@ -358,10 +363,10 @@ def signup(request):
 
         if fullname and licenseno and email and password:
             # Check if a user with the same email already exists
-            if User.objects.filter(email=email).exists():
+            if TmsUser.objects.filter(email=email).exists():
                 return JsonResponse({'success': False, 'message': 'User with the same email already exists'})
 
-            user = User.objects.create(
+            user = TmsUser.objects.create(
                 fullName=fullname,
                 licenseno=licenseno,
                 email=email,
@@ -385,34 +390,24 @@ def signup(request):
     else:
         return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
-    
 
 @csrf_exempt
-def UserLogout(request):
+def change_adminpass(request):
     if request.method == 'POST':
-        logout(request)
-        return JsonResponse({'success': True, 'message': 'Logout successful'})
+        data = json.loads(request.body)
+        password = data.get('newpass')
+        email = data.get('email')
+        print(email)
+        print(password)
+        if (admin_login.objects.filter(email=email).exists()):
+            data = admin_login.objects.get(email=email)
+            data.password = password
+            data.save()
+            return JsonResponse({'success': True, 'message': 'Password changed successfully'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Not changed'})
     else:
-        return JsonResponse({'message': 'Invalid request method'})
-    
-
-# @csrf_exempt
-# def UserChangePassword(request):
-#     if request.method == 'POST':
-#         data=json.loads(request.body)
-#         email = data.get('email')
-#         old_password = data.get('old_password')
-#         new_password = data.get('new_password')
-#         print(f'Email: {email}, Old Password: {old_password}, New Password: {new_password}')
-#         user = customauthenticate(email=email, password=old_password)
-#         if user is not None:
-#             user.set_password(new_password)
-#             user.save()
-#             return JsonResponse({'success': True, 'message': 'Password changed successfully'})
-#         else:
-#             return JsonResponse({'success': False, 'message': 'Invalid credentials'})
-#     else:
-#         return JsonResponse({'message': 'Invalid request method'})
+        return JsonResponse({'success': False, 'message': 'Invalid Request'})
 
 @csrf_exempt
 def finePay(request):
@@ -434,6 +429,7 @@ def finePay(request):
                     district=district,
                     chit_number=chit_number
                 )
+                fine.save()
                 return JsonResponse({'success': True, 'message': 'Fine added successfully'})
         else:
             missing_fields = []
@@ -466,27 +462,63 @@ def Bluebook(request):
         district_code = data.get('district_code')
         province = data.get('province')
 
-        bluebook = Bluebook.objects.create(
-            vehicle_no = vehicle_no,
-            vehicle_type = vehicle_type,
-            lot_no = lot_no,
-            symbol = symbol,
-            district_code = district_code,
-            province = province
-        )
-        bluebook.save()
-        return JsonResponse({'success': True, 'message': 'Bluebook added successfully'})
+        if vehicle_no and vehicle_type and lot_no and symbol and district_code and province:
+            existing_bluebook = BluebookRenew.objects.filter(
+                vehicle_no=vehicle_no,
+                vehicle_type=vehicle_type,
+                lot_no=lot_no,
+                symbol=symbol,
+                district_code=district_code,
+                province=province
+            ).exists()
+            if existing_bluebook:
+                return JsonResponse({'success': False, 'message': 'Bluebook already exists'})
+            else:
+                bluebook = BluebookRenew.objects.create(
+                    vehicle_no=vehicle_no,
+                    vehicle_type=vehicle_type,
+                    lot_no=lot_no,
+                    symbol=symbol,
+                    district_code=district_code,
+                    province=province   
+                )
+                bluebook.save()
+                return JsonResponse({'success': True, 'message': 'Bluebook added successfully'})
+        else:
+            missing_fields = []
+            if not vehicle_no:
+                missing_fields.append('vehicle_no')
+            if not vehicle_type:
+                missing_fields.append('vehicle_type')
+            if not lot_no:
+                missing_fields.append('lot_no')
+            if not symbol:
+                missing_fields.append('symbol')
+            if not district_code:
+                missing_fields.append('district_code')
+            if not province:
+                missing_fields.append('province')
+
+            missing_fields_str = ', '.join(missing_fields)
+            return JsonResponse({'success': False, 'message': f'Missing data in fields: {missing_fields_str}'})
     else:
         return JsonResponse({'success': False ,'message': 'Invalid request method'})
+
     
 class ShowBluebook(generics.ListCreateAPIView):
     queryset = BluebookRenew.objects.all()
     serializer_class = BluebookSerializer
 
+from django.contrib.auth.decorators import login_required
+# from api.models import User
+@login_required
+@csrf_exempt
+def user_profile_api(request):
+    user = request.TmsUser
 
-class TotalOfficers(generics.ListCreateAPIView):
-    queryset = Officer.objects.all()
-
-    def list(self, request, *args, **kwargs):
-        count = self.queryset.count()
-        return Response({'count': count})
+    user_details = {
+        'email': user.email,
+        'fullName': user.fullName,
+        'licenseno': user.licenseno,
+    }
+    return JsonResponse(user_details)
